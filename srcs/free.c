@@ -14,3 +14,16 @@ void	free_2d_array(void **array)
 	}
 	free(array);
 }
+
+void free_tokens(t_token *token)
+{
+    t_token *tmp;
+
+    while (token)
+    {
+        tmp = token->next;
+        free(token->str);
+        free(token);
+        token = tmp;
+    }
+}

@@ -6,7 +6,8 @@ CFLAGS = -Wall -Wextra -Werror
 RM = rm -f
 
 LIB_DIR = ./lib
-SRCS_DIR = ./srcs ./srcs/builtin ./srcs/execution
+# TODO: debugあとで消す
+SRCS_DIR = ./srcs ./srcs/builtin ./srcs/execution ./srcs/tokenization ./debug
 
 LIB = $(LIB_DIR)/lib.a -lreadline
 
