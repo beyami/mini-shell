@@ -212,24 +212,72 @@ char	*process_quotes(char *str, char **envp)
 	return (result);
 }
 
-// $展開とクォート除去
-int	expand_tokens(t_token *tokens, char **envp)
+int expand_node_str(char **str, char **envp)
 {
-	t_token	*cur;
-	char	*expanded;
+	char *expanded;
 
-	cur = tokens;
-	while (cur)
+	expanded = process_quotes(*str, envp);
+	if (!expanded)
+		return (-1);
+	free(*str);
+	*str = expanded;
+	return (0);
+}
+
+int expand_redirs(t_redir **redirs, int redir_count, char **envp)
+{
+	int i;
+
+	i = 0;
+	while (i < redir_count)
 	{
-		if (cur->type == TK_WORD)
-		{
-			expanded = process_quotes(cur->str, envp);
-			if (!expanded)
-				return (-1);
-			free(cur->str);
-			cur->str = expanded;
-		}
-		cur = cur->next;
+		if (expand_node_str(&redirs[i]->str, envp) == -1)
+			return (-1);
+		i++;
 	}
 	return (0);
 }
+
+int expand(t_node *node, char **envp)
+{
+	int i;
+
+	if (!node)
+		return (0);
+	if (expand(node->lhs, envp) == -1)
+		return (-1);
+	if (expand(node->rhs, envp) == -1)
+		return (-1);
+	i = 0;
+	while (i < node->argc)
+	{
+		if (expand_node_str(&node->argv[i], envp) == -1)
+			return (-1);
+		i++;
+	}
+	if (expand_redirs(node->redirs, node->redir_count, envp) == -1)
+		return (-1);
+	return (0);
+}
+
+// // $展開とクォート除去
+// int	expand_tokens(t_token *tokens, char **envp)
+// {
+// 	t_token	*cur;
+// 	char	*expanded;
+
+// 	cur = tokens;
+// 	while (cur)
+// 	{
+// 		if (cur->type == TK_WORD)
+// 		{
+// 			expanded = process_quotes(cur->str, envp);
+// 			if (!expanded)
+// 				return (-1);
+// 			free(cur->str);
+// 			cur->str = expanded;
+// 		}
+// 		cur = cur->next;
+// 	}
+// 	return (0);
+// }

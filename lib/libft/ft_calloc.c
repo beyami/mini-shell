@@ -20,7 +20,10 @@ void	*ft_calloc(size_t nmemb, size_t size)
 		return (NULL);
 	result = malloc(nmemb * size);
 	if (!result)
+    {
+        perror("minishell");
 		return (NULL);
+    }
 	ft_bzero(result, nmemb * size);
 	return (result);
 }

@@ -26,7 +26,25 @@ int	main(int argc, char **argv, char **envp)
 			free_shell(shell);
 			exit(EXIT_FAILURE);
 		}
-		shell->status = expand_tokens(shell->tokens, shell->envp_cp);
+		// shell->status = expand_tokens(shell->tokens, shell->envp_cp);
+		// if (shell->status < 0)
+		// {
+		// 	free(input);
+		// 	free_shell(shell);
+		// 	exit(EXIT_FAILURE);
+		// }
+		// TODO: debugあとで消す
+		debug_tokenizer(shell->tokens);
+        shell->status = parse(shell->tokens, &shell->ast);
+        if (shell->status < 0)
+        {
+            free(input);
+            free_shell(shell);
+            exit(EXIT_FAILURE);
+        }
+        // TODO: debugあとで消す
+		// debug_parser(shell->ast);
+		shell->status = expand(shell->ast, shell->envp_cp);
 		if (shell->status < 0)
 		{
 			free(input);
@@ -34,10 +52,14 @@ int	main(int argc, char **argv, char **envp)
 			exit(EXIT_FAILURE);
 		}
 		// TODO: debugあとで消す
-		debug_tokenizer(shell->tokens);
-		/* TODO: 入力行を解析 */
+		debug_expand(shell->ast);
 		// execute(tokens, envp);
+		// 毎ループ更新されるためfree
 		free(input);
+		free_tokens(shell->tokens);
+		shell->tokens = NULL;
+		free_ast(shell->ast);
+		shell->ast = NULL;
 	}
 	free_shell(shell);
 	exit(EXIT_SUCCESS);
