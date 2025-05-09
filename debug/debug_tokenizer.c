@@ -17,10 +17,12 @@ void	print_tokens(t_token *token)
 
 void	debug_tokenizer(t_token *tokens)
 {
+    printf("===TOKENS===\n");
     if (!tokens)
     {
-        ft_dprintf(STDERR_FILENO, "debug_tokenizer: no tokens\n");
+        printf("No tokens.\n");
         return ;
     }
     print_tokens(tokens);
+    printf("===TOKENS END===\n");
 }

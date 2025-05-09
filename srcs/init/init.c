@@ -55,5 +55,6 @@ int	init(t_shell **shell, char **envp)
 			return (-1);
 		}
 	}
+    (*shell)->ast = NULL;
 	return (0);
 }
