@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+t_sh_sig g_sh_sig;
+
 int	main(int argc, char **argv, char **envp)
 {
 	char	*input;
@@ -8,6 +10,8 @@ int	main(int argc, char **argv, char **envp)
 	// TODO: (void)あとで消す(かも)
 	(void)argc;
 	(void)argv;
+	set_sigint();
+	set_sigquit();
 	input = NULL;
 	if (init(&shell, envp) < 0)
 		exit(1);

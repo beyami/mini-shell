@@ -15,11 +15,14 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <signal.h>
 // debug用
 # include <stdbool.h>
 
 // TODO: 頭に"./tmp"をつける
 # define HEREDOC_TMP "heredoc_tmp_"
+
+
 
 // exitステータス操作
 typedef enum e_st_op
@@ -85,6 +88,14 @@ typedef struct s_exec
 	int				child_pids[128];
 }					t_exec;
 
+// シグナル
+typedef struct s_sh_sig
+{
+	int		status;
+}	t_sh_sig;
+
+extern t_sh_sig g_sh_sig;
+
 // minishell全体
 typedef struct s_shell
 {
@@ -138,6 +149,9 @@ int					consume_reserved(t_token **rest, char *op);
 void				expand(t_node *node, char **envp);
 char				*append_string_free(char *dst, char *src);
 char				*append_char_free(char *dst, char c);
+
+void set_sigint(void);
+void set_sigquit(void);
 
 // utils
 char				*ft_getenv(char *name, char **envp);
