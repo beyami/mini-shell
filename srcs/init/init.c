@@ -32,13 +32,13 @@ char	**get_envp_copy(char **envp)
 	return (cp);
 }
 
-int	init(t_shell **shell, char **envp)
+void	init(t_shell **shell, char **envp)
 {
 	(*shell) = (t_shell *)malloc(sizeof(t_shell));
 	if (!(*shell))
 	{
 		perror("minishell");
-		return (-1);
+		exit(1);
 	}
 	sh_stat(ST_SET, 0);
 	(*shell)->tokens = NULL;
@@ -50,9 +50,8 @@ int	init(t_shell **shell, char **envp)
 		if (!(*shell)->envp_cp)
 		{
 			free(*shell);
-			return (-1);
+			exit(1);
 		}
 	}
-    (*shell)->ast = NULL;
-	return (0);
+	(*shell)->ast = NULL;
 }

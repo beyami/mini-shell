@@ -9,20 +9,20 @@
 # include <linux/limits.h>
 # include <readline/history.h>
 # include <readline/readline.h>
+# include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
-# include <signal.h>
 // debug用
 # include <stdbool.h>
 
 // TODO: 頭に"./tmp"をつける
 # define HEREDOC_TMP "heredoc_tmp_"
 
-
+extern sig_atomic_t	g_sig_received;
 
 // exitステータス操作
 typedef enum e_st_op
@@ -88,14 +88,6 @@ typedef struct s_exec
 	int				child_pids[128];
 }					t_exec;
 
-// シグナル
-typedef struct s_sh_sig
-{
-	int		status;
-}	t_sh_sig;
-
-extern t_sh_sig g_sh_sig;
-
 // minishell全体
 typedef struct s_shell
 {
@@ -105,7 +97,7 @@ typedef struct s_shell
 }					t_shell;
 
 // init
-int					init(t_shell **shell, char **envp);
+void				init(t_shell **shell, char **envp);
 
 // execution
 void				exec_if_relative_path(char **cmds, char **envp);
@@ -150,8 +142,10 @@ void				expand(t_node *node, char **envp);
 char				*append_string_free(char *dst, char *src);
 char				*append_char_free(char *dst, char c);
 
-void set_sigint(void);
-void set_sigquit(void);
+void				set_sigs_handler(void);
+void				handle_sigint(int signum);
+void				render_loop(t_shell *shell);
+void				handle_startup_errors(int argc, char **argv);
 
 // utils
 char				*ft_getenv(char *name, char **envp);
@@ -162,6 +156,7 @@ void				free_2d_array(char **array);
 void				free_tokens(t_token *token);
 void				free_redirs(t_redir **redirs);
 void				free_ast(t_node *ast);
+void				free_except_envp(t_shell *shell);
 void				free_shell(t_shell *shell);
 
 // debug
