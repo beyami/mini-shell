@@ -1,5 +1,6 @@
 #include "minishell.h"
 
+// FIXME: access以外の関数に置き換えたほうが良いかも
 // 相対パスなら実行
 void	exec_if_relative_path(char **cmds, char **envp)
 {

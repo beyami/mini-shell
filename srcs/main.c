@@ -1,5 +1,6 @@
 #include "minishell.h"
 
+// TODO: シグナルで終了する際は128 + シグナルの値がexitステータス
 sig_atomic_t	g_sig_received;
 
 int	main(int argc, char **argv, char **envp)
