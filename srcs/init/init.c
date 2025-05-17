@@ -1,5 +1,6 @@
 #include "minishell.h"
 
+// main関数で受け取ったenvpをコピーして返す
 char	**get_envp_copy(char **envp)
 {
 	char	**cp;

@@ -19,7 +19,6 @@ void	render_loop(t_shell *shell)
 		parse(shell->tokens, &shell->ast);
 		expand(shell->ast, shell->envp_cp);
 		execute(shell->ast, shell->envp_cp);
-		// 毎ループ更新されるためfree
 		free(input);
 		free_except_envp(shell);
 	}

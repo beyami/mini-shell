@@ -20,6 +20,7 @@ void	exec_pipe(t_node *node, t_exec *ctx, char **envp, int in_fd, int out_fd)
 
 // 木構造をたどりながら実行
 // FIXME: 引数4つ以内にする
+// FIXME: 子プロセスには環境変数のコピーを渡す？
 void	execute_segment(t_node *node, t_exec *ctx, char **envp, int in_fd,
 		int out_fd)
 {

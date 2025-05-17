@@ -1,15 +1,25 @@
 #include "minishell.h"
 
+// SIGINTシグナルハンドラ
+// 新しい行で新しいプロンプトを表示
+// グローバル変数の更新
 void	handle_sigint(int signum)
 {
-	(void)signum;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_replace_line("", 0);
 	rl_on_new_line();
 	rl_redisplay();
-	g_sig_received = 1;
+	g_sig_received = signum;
 }
 
+// SIGQUITシグナルハンドラ
+// グローバル変数の更新のみ
+void	handle_sigquit(int signum)
+{
+	g_sig_received = signum;
+}
+
+// SIGINTとSIGQUITに対してシグナルハンドラなどの設定
 void	set_sigs_handler(void)
 {
 	struct sigaction	sa_int;

@@ -34,6 +34,19 @@ int	get_var_name(char *str, char **name)
 	return (0);
 }
 
+// 最後の終了ステータスを取得
+// シグナルがあったなら128+シグナルの値
+char	*get_last_exit_status(void)
+{
+	int	status;
+
+	if (g_sig_received)
+		status = 128 + g_sig_received;
+	else
+		status = sh_stat(ST_GET, 0);
+	return (ft_itoa(status));
+}
+
 // ${変数名}を変数展開した文字列を返す
 // 例: $HOME -> /home/stakada
 // 同時に${変数名}の次の文字までポインタを進める
@@ -50,7 +63,7 @@ char	*expand_var(char **s, char **envp)
 		return (ft_strdup("$"));
 	*s += ft_strlen(name);
 	if (ft_strncmp(name, "?", 2) == 0)
-		value = ft_itoa(sh_stat(ST_GET, 0));
+		value = get_last_exit_status();
 	else
 	{
 		env = ft_getenv(name, envp);
@@ -186,20 +199,4 @@ void	expand(t_node *node, char **envp)
 	if (node->kind != ND_CMD)
 		return ;
 	expand_cmd_node(node, envp);
-	// コマンドと引数の文字列を展開
-	// while (i < node->argc)
-	// {
-	// 	if (expand_node_str(&node->argv[i], envp) != 0)
-	// 	{
-	// 		sh_stat(ST_SET, 1);
-	// 		return ;
-	// 	}
-	// 	i++;
-	// }
-	// // リダイレクトの文字列を展開
-	// if (expand_redirs(node->redirs, node->redir_count, envp) != 0)
-	// {
-	// 	sh_stat(ST_SET, 1);
-	// 	return ;
-	// }
 }
