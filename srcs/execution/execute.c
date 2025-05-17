@@ -58,7 +58,7 @@ void	execute(t_node *root, char **envp)
 		return ;
 	ctx.child_count = 0;
     // ビルトインコマンド単体の場合直接実行
-	if (root->kind == ND_CMD && is_builtin(root->argv[0]))
+	if (root->kind == ND_CMD && root->argv && is_builtin(root->argv[0]))
 	{
 		process_builtin_direct(root, envp);
 		return ;

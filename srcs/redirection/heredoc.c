@@ -24,6 +24,7 @@ int	create_temp_file(int index, char **temp_file)
 }
 
 // ヒアドキュメントの入力を一時ファイルに書き込む
+// FIXME: Norm
 int	write_heredoc_input(char *temp_file, t_redir *redir)
 {
 	int		temp_fd;
@@ -37,9 +38,15 @@ int	write_heredoc_input(char *temp_file, t_redir *redir)
 	}
 	while (1)
 	{
-		line = readline("> ");
+		write(STDOUT_FILENO, "> ", 2);
+		line = get_next_line(STDIN_FILENO);
 		if (!line)
+		{
+			ft_dprintf(STDERR_FILENO,
+				"minishell: warning: here-document delimited by end-of-file (wanted `%s')\n",
+				redir->str);
 			break ;
+		}
 		if (ft_strncmp(line, redir->str, ft_strlen(redir->str)) == 0)
 		{
 			free(line);
