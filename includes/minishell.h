@@ -4,15 +4,29 @@
 # include "ft_printf.h"
 # include "get_next_line.h"
 # include "libft.h"
+# include <errno.h>
+# include <fcntl.h>
+# include <linux/limits.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
 // debug用
 # include <stdbool.h>
+
+// TODO: 頭に"./tmp"をつける
+# define HEREDOC_TMP "heredoc_tmp_"
+
+// exitステータス操作
+typedef enum e_st_op
+{
+	ST_GET,
+	ST_SET,
+}					t_st_op;
 
 // 字句解析
 typedef enum e_token_type
@@ -64,65 +78,72 @@ typedef struct s_node
 	int				redir_count;
 }					t_node;
 
+// 実行部分の子プロセス管理
+typedef struct s_exec
+{
+	int				child_count;
+	int				child_pids[128];
+}					t_exec;
+
 // minishell全体
 typedef struct s_shell
 {
-	int				status;
-	// int				last_status;
 	char			**envp_cp;
 	t_token			*tokens;
 	t_node			*ast;
 }					t_shell;
 
 // init
-// init.c
 int					init(t_shell **shell, char **envp);
 
 // execution
-// child_exec.c
 void				exec_if_relative_path(char **cmds, char **envp);
 void				exec_if_absolute_path(char **cmds, char **envp);
-void				execute_in_child(char **cmds, char **envp);
-
-// execute.c
-int					execute(char **cmds, char **envp);
-
-// find_path.c
+void				exec_cmd(char **cmds, char **envp);
+int					exec_builtin_cmd(t_node *node, char **envp);
+void				process_builtin_direct(t_node *node, char **envp);
+void				process_exec_cmd(t_node *node, char **envp, int in_fd,
+						int out_fd);
+void				execute(t_node *root, char **envp);
+void				execute_segment(t_node *node, t_exec *ctx, char **envp,
+						int in_fd, int out_fd);
 char				*search_path(char *cmd_name, char **path_list,
-						char *path_tail);
-char				*resolve_cmd_path(char *cmd, char *path_env);
+						char *path_tail, int *status);
+char				*resolve_cmd_path(char *cmd, char *path_env, int *status);
+int					apply_redirs(t_node *node);
+int					get_heredoc_fd(t_redir *redir, int index);
+int					is_builtin(char *cmd);
+void				close_fds(int in_fd, int out_fd);
+void				wait_children(t_exec ctx);
 
 // tokenization
-// tokenize.c
-int					tokenize(char *line, t_token **tokens);
+void				tokenize(char *line, t_token **tokens);
 int					is_single_metachar(char *p);
 int					is_two_metachar(char *p);
+int					is_single_metachar(char *p);
+int					is_two_metachar(char *p);
+int					is_quote(char *p);
+int					is_space(char c);
 
 // parsing
-// parse.c
-int					parse(t_token *tokens, t_node **ast);
-// new_node.c
+void				parse(t_token *tokens, t_node **ast);
 t_node				*new_pipe_node(t_node *lhs, t_node *rhs);
 t_node				*new_command_node(void);
-// peek.c
 int					peek_word(t_token *token);
 int					peek_redir_op(t_token *token);
-// consume.c
 int					consume_word(t_token **rest, char **redir_str);
 int					consume_reserved(t_token **rest, char *op);
+
 // expansion
-// expand.c
-int					expand(t_node *node, char **envp);
+void				expand(t_node *node, char **envp);
 char				*append_string_free(char *dst, char *src);
+char				*append_char_free(char *dst, char c);
 
 // utils
-// ft_getenv.c
 char				*ft_getenv(char *name, char **envp);
-// xrealloc.c
-// void				*xrealloc(void *ptr, size_t old_size, size_t new_size);
-
+int					sh_stat(t_st_op op, int val);
+char				*ft_strndup(char *s, int len);
 // free
-// free.c
 void				free_2d_array(char **array);
 void				free_tokens(t_token *token);
 void				free_redirs(t_redir **redirs);
@@ -130,7 +151,6 @@ void				free_ast(t_node *ast);
 void				free_shell(t_shell *shell);
 
 // debug
-// debug_tokenize.c
 void				print_tokens(t_token *token);
 void				debug_tokenizer(t_token *tokens);
 void				print_indent(int depth, bool is_last);

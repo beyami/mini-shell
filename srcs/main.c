@@ -10,7 +10,8 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	input = NULL;
 	if (init(&shell, envp) < 0)
-		exit(EXIT_FAILURE);
+		exit(1);
+    rl_clear_history();
 	while (1)
 	{
 		input = readline("minishell$ ");
@@ -18,42 +19,11 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (*input)
 			add_history(input);
-		// TODO: exitするかどうか & ステータスの管理
-		shell->status = tokenize(input, &shell->tokens);
-		if (shell->status < 0)
-		{
-			free(input);
-			free_shell(shell);
-			exit(EXIT_FAILURE);
-		}
-		// shell->status = expand_tokens(shell->tokens, shell->envp_cp);
-		// if (shell->status < 0)
-		// {
-		// 	free(input);
-		// 	free_shell(shell);
-		// 	exit(EXIT_FAILURE);
-		// }
-		// TODO: debugあとで消す
-		debug_tokenizer(shell->tokens);
-        shell->status = parse(shell->tokens, &shell->ast);
-        if (shell->status < 0)
-        {
-            free(input);
-            free_shell(shell);
-            exit(EXIT_FAILURE);
-        }
-        // TODO: debugあとで消す
-		// debug_parser(shell->ast);
-		shell->status = expand(shell->ast, shell->envp_cp);
-		if (shell->status < 0)
-		{
-			free(input);
-			free_shell(shell);
-			exit(EXIT_FAILURE);
-		}
-		// TODO: debugあとで消す
-		debug_expand(shell->ast);
-		// execute(tokens, envp);
+        // TODO: それぞれエラー時の処理を追加
+		tokenize(input, &shell->tokens);
+        parse(shell->tokens, &shell->ast);
+		expand(shell->ast, shell->envp_cp);
+		execute(shell->ast, envp);
 		// 毎ループ更新されるためfree
 		free(input);
 		free_tokens(shell->tokens);
@@ -62,5 +32,5 @@ int	main(int argc, char **argv, char **envp)
 		shell->ast = NULL;
 	}
 	free_shell(shell);
-	exit(EXIT_SUCCESS);
+	exit(0);
 }

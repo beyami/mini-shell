@@ -2,7 +2,7 @@
 
 void debug_expand(t_node *ast)
 {
-	printf("===AST (expanded) ===\n");
+	printf("===AST (expanded)===\n");
 	if (!ast)
 	{
 		printf("AST is NULL\n");

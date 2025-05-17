@@ -1,88 +1,5 @@
 #include "minishell.h"
 
-// 文字数指定ft_strdup
-char	*ft_strndup(char *s, int len)
-{
-	char	*new;
-	int		i;
-
-	if (!s || len <= 0)
-		return (NULL);
-	new = (char *)malloc(sizeof(char) * (len + 1));
-	if (!new)
-	{
-		perror("minishell");
-		return (NULL);
-	}
-	i = 0;
-	while (s[i] && i < len)
-	{
-		new[i] = s[i];
-		i++;
-	}
-	new[i] = '\0';
-	return (new);
-}
-
-// dstの末尾にsrcを追加した文字列を返す
-// dstとsrcはfreeする（どちらもmallocされた文字列の前提）
-char	*append_string_free(char *dst, char *src)
-{
-	size_t	new_len;
-	char	*new;
-
-	if (!dst || !src)
-	{
-		free(dst);
-		free(src);
-		return (NULL);
-	}
-	new_len = ft_strlen(dst) + ft_strlen(src) + 1;
-	new = (char *)malloc(new_len);
-	if (!new)
-	{
-		perror("minishell");
-		free(dst);
-		free(src);
-		return (NULL);
-	}
-	new[0] = '\0';
-	ft_strlcpy(new, dst, new_len);
-	ft_strlcat(new, src, new_len);
-	free(dst);
-	free(src);
-	return (new);
-}
-
-// dstの末尾にcを追加した文字列を返す
-// dstはfreeする（mallocされた文字列の前提）
-char	*append_char_free(char *dst, char c)
-{
-	size_t	len;
-	char	*new;
-	char	tmp[2];
-
-	if (!dst)
-	{
-		tmp[0] = c;
-		tmp[1] = '\0';
-		return (ft_strdup(tmp));
-	}
-	len = ft_strlen(dst);
-	new = (char *)malloc(len + 2);
-	if (!new)
-	{
-		perror("minishell");
-		free(dst);
-		return (NULL);
-	}
-	ft_strlcpy(new, dst, len + 1);
-	new[len] = c;
-	new[len + 1] = '\0';
-	free(dst);
-	return (new);
-}
-
 // 環境変数名に含むことができる文字かどうか判定
 int	is_var_char(char c)
 {
@@ -133,8 +50,7 @@ char	*expand_var(char **s, char **envp)
 		return (ft_strdup("$"));
 	*s += ft_strlen(name);
 	if (ft_strncmp(name, "?", 2) == 0)
-		// TODO: 実際のexitステータスに変更
-		value = ft_itoa(0);
+		value = ft_itoa(sh_stat(ST_GET, 0));
 	else
 	{
 		env = ft_getenv(name, envp);
@@ -212,72 +128,77 @@ char	*process_quotes(char *str, char **envp)
 	return (result);
 }
 
-int expand_node_str(char **str, char **envp)
+// 文字列を展開
+int	expand_node_str(char **str, char **envp)
 {
-	char *expanded;
+	char	*expanded;
 
 	expanded = process_quotes(*str, envp);
 	if (!expanded)
-		return (-1);
+		return (1);
 	free(*str);
 	*str = expanded;
 	return (0);
 }
 
-int expand_redirs(t_redir **redirs, int redir_count, char **envp)
+// ND_CMDの展開
+void	expand_cmd_node(t_node *node, char **envp)
 {
-	int i;
+	int	i;
 
-	i = 0;
-	while (i < redir_count)
-	{
-		if (expand_node_str(&redirs[i]->str, envp) == -1)
-			return (-1);
-		i++;
-	}
-	return (0);
-}
-
-int expand(t_node *node, char **envp)
-{
-	int i;
-
-	if (!node)
-		return (0);
-	if (expand(node->lhs, envp) == -1)
-		return (-1);
-	if (expand(node->rhs, envp) == -1)
-		return (-1);
 	i = 0;
 	while (i < node->argc)
 	{
-		if (expand_node_str(&node->argv[i], envp) == -1)
-			return (-1);
+		if (expand_node_str(&node->argv[i], envp) != 0)
+		{
+			sh_stat(ST_SET, 1);
+			return ;
+		}
 		i++;
 	}
-	if (expand_redirs(node->redirs, node->redir_count, envp) == -1)
-		return (-1);
-	return (0);
+	i = 0;
+	while (i < node->redir_count)
+	{
+		if (expand_node_str(&node->redirs[i]->str, envp) != 0)
+		{
+			sh_stat(ST_SET, 1);
+			return ;
+		}
+		i++;
+	}
 }
 
-// // $展開とクォート除去
-// int	expand_tokens(t_token *tokens, char **envp)
-// {
-// 	t_token	*cur;
-// 	char	*expanded;
-
-// 	cur = tokens;
-// 	while (cur)
-// 	{
-// 		if (cur->type == TK_WORD)
-// 		{
-// 			expanded = process_quotes(cur->str, envp);
-// 			if (!expanded)
-// 				return (-1);
-// 			free(cur->str);
-// 			cur->str = expanded;
-// 		}
-// 		cur = cur->next;
-// 	}
-// 	return (0);
-// }
+// 変数展開メイン処理
+void	expand(t_node *node, char **envp)
+{
+	if (!node)
+		return ;
+	// 再帰で一番左のノードから根に向かって展開
+	expand(node->lhs, envp);
+	if (sh_stat(ST_GET, 0) != 0)
+		return ;
+	// 自身がND_PIPEなら先に右のノードを展開
+	expand(node->rhs, envp);
+	if (sh_stat(ST_GET, 0) != 0)
+		return ;
+	// ND_CMDのみ展開を行う
+	if (node->kind != ND_CMD)
+		return ;
+	expand_cmd_node(node, envp);
+	// コマンドと引数の文字列を展開
+	// while (i < node->argc)
+	// {
+	// 	if (expand_node_str(&node->argv[i], envp) != 0)
+	// 	{
+	// 		sh_stat(ST_SET, 1);
+	// 		return ;
+	// 	}
+	// 	i++;
+	// }
+	// // リダイレクトの文字列を展開
+	// if (expand_redirs(node->redirs, node->redir_count, envp) != 0)
+	// {
+	// 	sh_stat(ST_SET, 1);
+	// 	return ;
+	// }
+}

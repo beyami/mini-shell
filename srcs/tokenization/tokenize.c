@@ -1,37 +1,5 @@
 #include "minishell.h"
 
-// パイプとリダイレクトの記号を判定
-int	is_single_metachar(char *p)
-{
-	if (*p == '|' || *p == '<' || *p == '>')
-		return (1);
-	return (0);
-}
-
-// heredocとappendの記号を判定
-int	is_two_metachar(char *p)
-{
-	if (ft_strncmp(p, "<<", 2) == 0 || ft_strncmp(p, ">>", 2) == 0)
-		return (1);
-	return (0);
-}
-
-// 引用符を判定
-int	is_quote(char *p)
-{
-	if (*p == '\'' || *p == '"')
-		return (1);
-	return (0);
-}
-
-int	ft_isspace(char c)
-{
-	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
-		|| c == '\r')
-		return (1);
-	return (0);
-}
-
 // トークンを追加（新しいトークンへのポインタを返すことでcurrentを一つ進める）
 t_token	*add_token(t_token *cur, t_token_type type, char *start, int len)
 {
@@ -58,7 +26,7 @@ t_token	*add_token(t_token *cur, t_token_type type, char *start, int len)
 }
 
 // 入力をトークンに分割
-int	tokenize(char *line, t_token **tokens)
+void	tokenize(char *line, t_token **tokens)
 {
 	t_token head;
 	t_token *cur;
@@ -72,7 +40,7 @@ int	tokenize(char *line, t_token **tokens)
 	while (*p)
 	{
 		// 空白文字をスキップ
-		if (ft_isspace(*p))
+		if (is_space(*p))
 			p++;
 		// 2文字のメタ文字をトークン化
 		else if (is_two_metachar(p))
@@ -81,7 +49,8 @@ int	tokenize(char *line, t_token **tokens)
 			if (!cur)
 			{
 				free_tokens(head.next);
-				return (-1);
+                sh_stat(ST_SET, 1);
+				return ;
 			}
 			p += 2;
 		}
@@ -92,7 +61,8 @@ int	tokenize(char *line, t_token **tokens)
 			if (!cur)
 			{
 				free_tokens(head.next);
-				return (-1);
+                sh_stat(ST_SET, 1);
+				return ;
 			}
 			p++;
 		}
@@ -101,7 +71,7 @@ int	tokenize(char *line, t_token **tokens)
 		else
 		{
 			start = p;
-			while (*p && !ft_isspace(*p) && !is_two_metachar(p)
+			while (*p && !is_space(*p) && !is_two_metachar(p)
 				&& !is_single_metachar(p))
 			{
 				if (is_quote(p))
@@ -117,7 +87,8 @@ int	tokenize(char *line, t_token **tokens)
 						write(STDERR_FILENO,
 							"minishell: syntax error: unclosed quote\n", 41);
 						free_tokens(head.next);
-						return (1);
+						sh_stat(ST_SET, 2);
+                        return ;
 					}
 				}
 				else
@@ -127,7 +98,8 @@ int	tokenize(char *line, t_token **tokens)
 			if (!cur)
 			{
 				free_tokens(head.next);
-				return (-1);
+				sh_stat(ST_SET, 1);
+                return ;
 			}
 		}
 	}
@@ -135,8 +107,8 @@ int	tokenize(char *line, t_token **tokens)
 	if (!add_token(cur, TK_EOF, p, 0))
 	{
 		free_tokens(head.next);
-		return (-1);
+		sh_stat(ST_SET, 1);
+        return ;
 	}
 	(*tokens) = head.next;
-	return (0);
 }

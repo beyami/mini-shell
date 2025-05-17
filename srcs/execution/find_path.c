@@ -1,7 +1,8 @@
 #include "minishell.h"
 
 // 環境変数PATHの値を一つずつ確認
-char	*search_path(char *cmd_name, char **path_list, char *path_tail)
+char	*search_path(char *cmd_name, char **path_list, char *path_tail,
+		int *status)
 {
 	char	*path;
 	int		i;
@@ -20,12 +21,13 @@ char	*search_path(char *cmd_name, char **path_list, char *path_tail)
 		free(path);
 		i++;
 	}
-	ft_dprintf(STDERR_FILENO, "%s: command not found\n", cmd_name);
+	ft_dprintf(STDERR_FILENO, "minishell: %s: command not found\n", cmd_name);
+	(*status) = 127;
 	return (NULL);
 }
 
 // 環境変数PATHからコマンドのパスを探す
-char	*resolve_cmd_path(char *cmd, char *path_env)
+char	*resolve_cmd_path(char *cmd, char *path_env, int *status)
 {
 	char	*path_tail;
 	char	**path_list;
@@ -44,7 +46,7 @@ char	*resolve_cmd_path(char *cmd, char *path_env)
 		free(path_tail);
 		return (NULL);
 	}
-	filepath = search_path(cmd, path_list, path_tail);
+	filepath = search_path(cmd, path_list, path_tail, status);
 	if (!filepath)
 	{
 		free(path_tail);

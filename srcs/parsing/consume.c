@@ -16,13 +16,13 @@ int	consume_word(t_token **rest, char **redir_str)
 				"minishell: syntax error near unexpected token `%s'\n",
 				cur->str);
 		(*redir_str) = NULL;
-		return (1);
+        return (2);
 	}
 	(*redir_str) = ft_strdup(cur->str);
 	if (!(*redir_str))
-		return (-1);
+        return (1);
 	*rest = cur->next;
-	return (0);
+    return (0);
 }
 
 // トークンがTK_RESERVEDかつ指定された記号に一致するか確認して次のトークンに進める
