@@ -49,7 +49,7 @@ int	write_heredoc_input(char *temp_file, t_redir *redir)
 		write(temp_fd, "\n", 1);
 		free(line);
 	}
-    close(temp_fd);
+	close(temp_fd);
 	return (0);
 }
 
@@ -77,10 +77,10 @@ int	get_heredoc_fd(t_redir *redir, int index)
 	if (create_temp_file(index, &temp_file) != 0)
 		return (-1);
 	if (write_heredoc_input(temp_file, redir) != 0)
-    {
-        free(temp_file);
-        return (-1);
-    }
+	{
+		free(temp_file);
+		return (-1);
+	}
 	read_fd = open_and_unlink_temp(temp_file);
 	if (read_fd < 0)
 	{

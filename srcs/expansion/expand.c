@@ -65,6 +65,7 @@ char	*expand_var(char **s, char **envp)
 
 // ${変数名}と$?を展開後の文字列を置き換える
 // 同時にクォートの除去を行う
+// FIXME: Norm
 char	*process_quotes(char *str, char **envp)
 {
 	char	*result;

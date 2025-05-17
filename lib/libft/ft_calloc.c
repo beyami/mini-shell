@@ -6,7 +6,7 @@
 /*   By: stakada <stakada@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 20:07:33 by stakada           #+#    #+#             */
-/*   Updated: 2024/11/10 00:21:32 by stakada          ###   ########.fr       */
+/*   Updated: 2025/05/17 13:49:40 by stakada          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ void	*ft_calloc(size_t nmemb, size_t size)
 		return (NULL);
 	result = malloc(nmemb * size);
 	if (!result)
-    {
-        perror("minishell");
+	{
+		perror("minishell");
 		return (NULL);
-    }
+	}
 	ft_bzero(result, nmemb * size);
 	return (result);
 }

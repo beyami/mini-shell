@@ -1,6 +1,8 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+// TODO: コメント削除
+
 # include "ft_printf.h"
 # include "get_next_line.h"
 # include "libft.h"

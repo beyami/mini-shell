@@ -23,11 +23,11 @@ t_redir	*parse_redir(t_token **rest)
 			`%s\n'",
 					(*rest)->str);
 		free(redir);
-        sh_stat(ST_SET, 2);
+		sh_stat(ST_SET, 2);
 		return (NULL);
 	}
 	sh_stat(ST_SET, consume_word(rest, &redir->str));
-    if (sh_stat(ST_GET, 0) == 1)
+	if (sh_stat(ST_GET, 0) == 1)
 	{
 		free(redir);
 		return (NULL);

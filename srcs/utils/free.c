@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+// TODO: ファイル分割
+
 void	free_2d_array(char **array)
 {
 	int	i;

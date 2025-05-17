@@ -28,8 +28,8 @@ t_token	*add_token(t_token *cur, t_token_type type, char *start, int len)
 // 入力をトークンに分割
 void	tokenize(char *line, t_token **tokens)
 {
-	t_token head;
-	t_token *cur;
+	t_token	head;
+	t_token	*cur;
 	char	*p;
 	char	*start;
 	char	quote;
@@ -49,7 +49,7 @@ void	tokenize(char *line, t_token **tokens)
 			if (!cur)
 			{
 				free_tokens(head.next);
-                sh_stat(ST_SET, 1);
+				sh_stat(ST_SET, 1);
 				return ;
 			}
 			p += 2;
@@ -61,7 +61,7 @@ void	tokenize(char *line, t_token **tokens)
 			if (!cur)
 			{
 				free_tokens(head.next);
-                sh_stat(ST_SET, 1);
+				sh_stat(ST_SET, 1);
 				return ;
 			}
 			p++;
@@ -88,7 +88,7 @@ void	tokenize(char *line, t_token **tokens)
 							"minishell: syntax error: unclosed quote\n", 41);
 						free_tokens(head.next);
 						sh_stat(ST_SET, 2);
-                        return ;
+						return ;
 					}
 				}
 				else
@@ -99,7 +99,7 @@ void	tokenize(char *line, t_token **tokens)
 			{
 				free_tokens(head.next);
 				sh_stat(ST_SET, 1);
-                return ;
+				return ;
 			}
 		}
 	}
@@ -108,7 +108,7 @@ void	tokenize(char *line, t_token **tokens)
 	{
 		free_tokens(head.next);
 		sh_stat(ST_SET, 1);
-        return ;
+		return ;
 	}
 	(*tokens) = head.next;
 }
