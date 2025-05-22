@@ -40,7 +40,7 @@ void	tokenize(char *line, t_token **tokens)
 	while (*p)
 	{
 		// 空白文字をスキップ
-		if (is_space(*p))
+		if (is_blank(*p))
 			p++;
 		// 2文字のメタ文字をトークン化
 		else if (is_two_metachar(p))
@@ -71,7 +71,7 @@ void	tokenize(char *line, t_token **tokens)
 		else
 		{
 			start = p;
-			while (*p && !is_space(*p) && !is_two_metachar(p)
+			while (*p && !is_blank(*p) && !is_two_metachar(p)
 				&& !is_single_metachar(p))
 			{
 				if (is_quote(p))

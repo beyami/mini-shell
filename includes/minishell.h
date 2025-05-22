@@ -122,7 +122,7 @@ int					is_two_metachar(char *p);
 int					is_single_metachar(char *p);
 int					is_two_metachar(char *p);
 int					is_quote(char *p);
-int					is_space(char c);
+int					is_blank(char c);
 
 // parsing
 void				parse(t_token *tokens, t_node **ast);
@@ -137,6 +137,7 @@ int					consume_reserved(t_token **rest, char *op);
 void				expand(t_node *node, char **envp);
 char				*append_string_free(char *dst, char *src);
 char				*append_char_free(char *dst, char c);
+
 
 // utils
 char				*ft_getenv(char *name, char **envp);

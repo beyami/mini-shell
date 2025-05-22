@@ -141,6 +141,74 @@ int	expand_node_str(char **str, char **envp)
 	return (0);
 }
 
+// MEMO: unsetのrm_envで代用可能
+int	rm_argv_str(int rm_idx, char ***argv)
+{
+	int		argv_len;
+	char	**new;
+	int		i;
+	int		j;
+
+	argv_len = 0;
+	while ((*argv)[argv_len])
+		argv_len++;
+	new = (char **)malloc(sizeof(char *) * argv_len);
+	if (!new)
+	{
+		perror("minishell: malloc");
+		return (1);
+	}
+	i = 0;
+	j = 0;
+	while (j < argv_len)
+	{
+		if (j != rm_idx)
+		{
+			new[i] = (*argv)[j];
+			i++;
+		}
+		else
+			free((*argv)[j]);
+		j++;
+	}
+	new[i] = NULL;
+	free(*argv);
+	*argv = new;
+	return (0);
+}
+
+int	rm_empty_argv_str(char ***argv)
+{
+	int	i;
+	int	ret;
+
+	i = 0;
+	ret = 0;
+	while ((*argv)[i])
+	{
+		if ((*argv)[i][0] == '\0')
+		{
+			if (rm_argv_str(i, argv) != 0)
+				return (1);
+		}
+		i++;
+	}
+	return (0);
+}
+
+// int	split_argv_str(int *argc, char ***argv)
+// {
+// 	int total_len;
+
+// 	if (!argv || !*argv)
+// 		return (0);
+// 	total_len = 0;
+// 	i = 0;
+// 	while ((*argv)[i])
+// 	{
+// 	}
+// }
+
 // ND_CMDの展開
 void	expand_cmd_node(t_node *node, char **envp)
 {
@@ -155,6 +223,13 @@ void	expand_cmd_node(t_node *node, char **envp)
 			return ;
 		}
 		i++;
+	}
+	// if (rm_empty_argv_str(&node->argv) != 0 || split_argv_str(&node->argc,
+	// 		&node->argv) != 0)
+	if (rm_empty_argv_str(&node->argv) != 0)
+	{
+		sh_stat(ST_SET, 1);
+		return ;
 	}
 	i = 0;
 	while (i < node->redir_count)
@@ -185,20 +260,4 @@ void	expand(t_node *node, char **envp)
 	if (node->kind != ND_CMD)
 		return ;
 	expand_cmd_node(node, envp);
-	// コマンドと引数の文字列を展開
-	// while (i < node->argc)
-	// {
-	// 	if (expand_node_str(&node->argv[i], envp) != 0)
-	// 	{
-	// 		sh_stat(ST_SET, 1);
-	// 		return ;
-	// 	}
-	// 	i++;
-	// }
-	// // リダイレクトの文字列を展開
-	// if (expand_redirs(node->redirs, node->redir_count, envp) != 0)
-	// {
-	// 	sh_stat(ST_SET, 1);
-	// 	return ;
-	// }
 }
