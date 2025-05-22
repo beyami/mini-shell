@@ -141,73 +141,68 @@ int	expand_node_str(char **str, char **envp)
 	return (0);
 }
 
-// MEMO: unsetのrm_envで代用可能
-int	rm_argv_str(int rm_idx, char ***argv)
+int	count_valid_argv(char ***argv)
 {
-	int		argv_len;
-	char	**new;
 	int		i;
-	int		j;
+	int		count;
 
-	argv_len = 0;
-	while ((*argv)[argv_len])
-		argv_len++;
-	new = (char **)malloc(sizeof(char *) * argv_len);
+	i = 0;
+	count = 0;
+	while ((*argv)[i])
+	{
+		if ((*argv)[i][0] != '\0')
+			count++;
+		i++;
+	}
+	return (count);
+}
+
+void	copy_valid_args(char ***argv, char **new)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while ((*argv)[i])
+	{
+		if ((*argv)[i][0] != '\0')
+		{
+			new[j] = (*argv)[i];
+			j++;
+		}
+		else
+			free((*argv)[i]);
+		i++;
+	}
+}
+
+// argvから空文字列を削除
+int	rm_empty_argv_str(int *argc, char ***argv)
+{
+	int	valid_cnt;
+	char **new;
+
+	valid_cnt = count_valid_argv(argv);
+	*argc = valid_cnt;
+	new = (char **)malloc(sizeof(char *) * (valid_cnt + 1));
 	if (!new)
 	{
 		perror("minishell: malloc");
 		return (1);
 	}
-	i = 0;
-	j = 0;
-	while (j < argv_len)
+	copy_valid_args(argv, new);
+	new[valid_cnt] = NULL;
+	free((*argv));
+	if (!new[0])
 	{
-		if (j != rm_idx)
-		{
-			new[i] = (*argv)[j];
-			i++;
-		}
-		else
-			free((*argv)[j]);
-		j++;
+		free(new);
+		*argv = NULL;
 	}
-	new[i] = NULL;
-	free(*argv);
-	*argv = new;
+	else
+		*argv = new;
 	return (0);
 }
-
-int	rm_empty_argv_str(char ***argv)
-{
-	int	i;
-	int	ret;
-
-	i = 0;
-	ret = 0;
-	while ((*argv)[i])
-	{
-		if ((*argv)[i][0] == '\0')
-		{
-			if (rm_argv_str(i, argv) != 0)
-				return (1);
-		}
-		i++;
-	}
-	return (0);
-}
-
-// int	split_argv_str(int *argc, char ***argv)
-// {
-// 	int total_len;
-
-// 	if (!argv || !*argv)
-// 		return (0);
-// 	total_len = 0;
-// 	i = 0;
-// 	while ((*argv)[i])
-// 	{
-// 	}
-// }
 
 // ND_CMDの展開
 void	expand_cmd_node(t_node *node, char **envp)
@@ -224,9 +219,7 @@ void	expand_cmd_node(t_node *node, char **envp)
 		}
 		i++;
 	}
-	// if (rm_empty_argv_str(&node->argv) != 0 || split_argv_str(&node->argc,
-	// 		&node->argv) != 0)
-	if (rm_empty_argv_str(&node->argv) != 0)
+	if (rm_empty_argv_str(&node->argc, &node->argv) != 0)
 	{
 		sh_stat(ST_SET, 1);
 		return ;

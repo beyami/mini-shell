@@ -44,10 +44,15 @@ void	print_ast(t_node *node, int depth)
 	else if (node->kind == ND_CMD)
 	{
 		print_indent(depth, false);
-		printf("CMD: ");
-		for (int i = 0; i < node->argc; i++)
-			printf("%s ", node->argv[i]);
-		printf("\n");
+		if (node->argv)
+		{
+			printf("CMD: ");
+			for (int i = 0; i < node->argc; i++)
+				printf("%s ", node->argv[i]);
+			printf("\n");
+		}
+		else
+			puts("argv is NULL");
 		for (int i = 0; i < node->redir_count; i++)
 			print_redir(node->redirs[i], depth + 1);
 	}
