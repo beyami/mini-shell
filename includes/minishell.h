@@ -137,7 +137,7 @@ int					consume_reserved(t_token **rest, char *op);
 void				expand(t_node *node, char **envp);
 char				*append_string_free(char *dst, char *src);
 char				*append_char_free(char *dst, char c);
-
+int					rm_empty_argv_str(int *argc, char ***argv);
 
 // utils
 char				*ft_getenv(char *name, char **envp);
