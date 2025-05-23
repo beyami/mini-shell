@@ -53,7 +53,7 @@ int	rm_empty_argv_str(int *argc, char ***argv)
 	copy_valid_args(argv, new);
 	new[valid_cnt] = NULL;
 	free((*argv));
-	if (!new[0])
+	if (valid_cnt == 0)
 	{
 		free(new);
 		*argv = NULL;
