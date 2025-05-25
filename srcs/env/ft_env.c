@@ -6,7 +6,7 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 22:38:00 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/25 07:48:56 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/25 09:08:02 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,51 @@ char	*ft_strjoin_delim(char *s1, char delim, char *s2)
 	rtn[len1] = delim;
 	rtn[len1 + 1] = '\0';
 	ft_strlcat(rtn, s2, len2 + len1 + 2);
+	return (rtn);
+}
+
+char	*rm_quotes(char *val)
+{
+	char	quote;
+	int		i;
+	int		j;
+	char	*rtn;
+
+	i = 0;
+	j = 0;
+	quote = '\0';
+	if (!val)
+		return (NULL);
+	while (val[i])
+	{
+		if ((quote && val[i] != quote) || !is_quote(&val[i]))
+			++j;
+		else if (!quote)
+			quote = val[i];
+		else if (quote)
+			quote = '\0';
+		++i;
+	}
+	rtn = malloc(sizeof(char) * j + 1);
+	if (!rtn)
+	{
+		ft_dprintf(STDERR_FILENO, "minishell: malloc: %s", strerror(errno));
+		free(val);
+		return (NULL);
+	}
+	i = 0;
+	j = 0;
+	while (val[i])
+	{
+		if ((quote && val[i] != quote) || !is_quote(&val[i]))
+			rtn[j++] = val[i];
+		else if (!quote)
+			quote = val[i];
+		else if (quote)
+			quote = '\0';
+		++i;
+	}
+	free(val);
 	return (rtn);
 }
 
@@ -56,7 +101,7 @@ t_env	*new_env(char *str, int offset)
 	{
 		rtn->type = VAL_EX;
 		rtn->name = ft_strndup(str, (int)(eq - str - offset));
-		rtn->val = ft_strdup(eq + 1);
+		rtn->val = rm_quotes(ft_strdup(eq + 1));
 		rtn->full = ft_strjoin_delim(rtn->name, '=', rtn->val);
 	}
 	rtn->next = NULL;
@@ -199,11 +244,11 @@ t_env	*ft_update_env(t_env **head, char *str, int offset)
 		return (ft_add_env(head, str, offset));
 	val = ft_strchr(str, '=') + 1;
 	if (offset && target->type == VAL_EX)
-		tmp = ft_strjoin(target->val, val);
+		tmp = rm_quotes(ft_strjoin(target->val, val));
 	else
 	{
 		target->type = VAL_EX;
-		tmp = ft_strdup(val);
+		tmp = rm_quotes(ft_strdup(val));
 	}
 	if (!tmp)
 	{
