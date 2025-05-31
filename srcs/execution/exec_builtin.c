@@ -22,7 +22,7 @@ int	exec_builtin_cmd(t_node *node)
 	else if (ft_strncmp(cmd, "env", 4) == 0)
 		stat = env(node->argc, node->argv);
 	else if (ft_strncmp(cmd, "exit", 5) == 0)
-		stat = ft_exit(node->argc, node->argv);
+		stat = ft_exit(node->argc, node->argv, 1);
 	return (sh_stat(ST_SET, stat));
 }
 

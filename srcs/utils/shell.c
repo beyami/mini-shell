@@ -1,31 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   shell.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/08 20:18:14 by stakada           #+#    #+#             */
-/*   Updated: 2025/05/29 05:54:45 by yumiyao          ###   ########.fr       */
+/*   Created: 2025/05/29 04:46:57 by yumiyao           #+#    #+#             */
+/*   Updated: 2025/05/29 05:02:15 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-char	*ft_strdup(const char *s)
+t_shell	*sh_op(t_op_shell op, t_shell *shell)
 {
-	char	*new;
-	int		i;
+	static t_shell	*inner_shell;
 
-	new = (char *)ft_malloc(sizeof(char) * (ft_strlen(s) + 1));
-	if (!new)
-		return (NULL);
-	i = 0;
-	while (s[i])
+	if (op == SH_SET)
+		inner_shell = shell;
+	else if (op == SH_GET)
+		return (inner_shell);
+	else if (op == SH_DEL)
 	{
-		new[i] = s[i];
-		i++;
+		free_shell(&inner_shell);
+		inner_shell = NULL;
 	}
-	new[i] = '\0';
-	return (new);
+	return (inner_shell);
 }

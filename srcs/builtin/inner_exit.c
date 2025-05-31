@@ -1,31 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   inner_exit.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/08 20:18:14 by stakada           #+#    #+#             */
-/*   Updated: 2025/05/29 05:54:45 by yumiyao          ###   ########.fr       */
+/*   Created: 2025/05/31 21:09:05 by yumiyao           #+#    #+#             */
+/*   Updated: 2025/05/31 21:10:59 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-char	*ft_strdup(const char *s)
+void	inner_exit(int status)
 {
-	char	*new;
-	int		i;
-
-	new = (char *)ft_malloc(sizeof(char) * (ft_strlen(s) + 1));
-	if (!new)
-		return (NULL);
-	i = 0;
-	while (s[i])
-	{
-		new[i] = s[i];
-		i++;
-	}
-	new[i] = '\0';
-	return (new);
+	ft_env(ENV_DEL_ALL, NULL);
+	sh_op(SH_DEL, NULL);
+	exit(status);
 }

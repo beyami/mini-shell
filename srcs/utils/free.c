@@ -61,15 +61,15 @@ void	free_ast(t_node *ast)
 	free(ast);
 }
 
-void	free_shell(t_shell *shell)
+void	free_shell(t_shell **shell)
 {
-	if (shell->input)
-		free(shell->input);
-	if (shell->tokens)
-		free_tokens(shell->tokens);
-	if (shell->ast)
-		free_ast(shell->ast);
-	free(shell);
+	if ((*shell)->input)
+		free((*shell)->input);
+	if ((*shell)->tokens)
+		free_tokens((*shell)->tokens);
+	if ((*shell)->ast)
+		free_ast((*shell)->ast);
+	free(*shell);
 }
 
 void	free_env(t_env *env)

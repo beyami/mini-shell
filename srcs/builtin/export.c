@@ -6,7 +6,7 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 02:47:53 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/25 05:19:21 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/31 21:54:46 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	get_eq_idx(char *str, int *plus)
 	return ((int)(eq - str));
 }
 
-t_env	*set_env(char *str)
+int	set_env(char *str)
 {
 	int	i;
 	int	plus;
@@ -55,28 +55,44 @@ t_env	*set_env(char *str)
 
 	i = get_eq_idx(str, &plus);
 	if (i == -1)
-		return (NULL);
+		return (1);
 	if (plus)
-		return (ft_env(ENV_SET_PLUS, str));
+	{
+		if (ft_env(ENV_SET_PLUS, str) == NULL)
+		{
+			return (2);
+		}
+		return (0);
+	}
 	else
-		return (ft_env(ENV_SET, str));
+	{
+		if (ft_env(ENV_SET, str) == NULL)
+		{
+			return (2);
+		}
+		return (0);
+	}
 }
 
 int	export(int argc, char **argv)
 {
-	int		i;
-	t_env	*rtn;
-	int		error;
+	int	i;
+	int	rtn;
+	int	error;
 
 	if (argc == 1)
-		return (print_envs((char **)(ft_env(ENV_GET_ALL_EX, NULL))));
+		return (print_envs());
 	i = 1;
 	rtn = 0;
 	error = 0;
 	while (i < argc && argv[i])
 	{
 		rtn = set_env(argv[i]);
-		if (!rtn)
+		if (rtn == 2)
+		{
+			inner_exit(1);
+		}
+		if (rtn == 1)
 			error = 1;
 		++i;
 	}

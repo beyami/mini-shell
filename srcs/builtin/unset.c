@@ -6,13 +6,12 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 21:58:27 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/25 03:46:22 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/25 10:36:25 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// 指定された変数が存在しなかった場合, bashでは成功が返るがminishellではexportに合わせエラーとして返す
 int	unset(int argc, char **argv)
 {
 	int	i;

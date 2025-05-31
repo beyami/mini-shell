@@ -124,58 +124,85 @@ int	is_valid_shlvl(char *num)
 	return (1);
 }
 
-void	init_shlvl(void)
+int	increment_shlvl(int shlvl)
+{
+	char	*str_shlvl;
+	char	*env_shlvl;
+
+	str_shlvl = ft_itoa(shlvl + 1);
+	env_shlvl = ft_strjoin("SHLVL=", str_shlvl);
+	if (!str_shlvl || !env_shlvl)
+	{
+		free(str_shlvl);
+		free(env_shlvl);
+		ft_env(ENV_DEL_ALL, NULL);
+		return (1);
+	}
+	if (ft_env(ENV_SET, env_shlvl) == NULL)
+	{
+		free(str_shlvl);
+		free(env_shlvl);
+		ft_env(ENV_DEL_ALL, NULL);
+		return (1);
+	}
+	free(str_shlvl);
+	free(env_shlvl);
+	return (0);
+}
+
+int	init_shlvl(void)
 {
 	char	*shlvl;
 	int		lvl;
-	char	*lvl_str;
 
 	shlvl = ft_env(ENV_GET_VAL, "SHLVL");
 	if (!shlvl || is_valid_shlvl(shlvl))
 	{
-		ft_env(ENV_ADD, "SHLVL=1");
-		return ;
+		if (ft_env(ENV_ADD, "SHLVL=1") == NULL)
+			return (1);
+		return (0);
 	}
 	lvl = pure_atoi(shlvl);
 	if (lvl > 998)
 	{
-		ft_dprintf(STDERR_FILENO,
-					"minishell: warning: shell level (%d) "
-					"too high, resetting to 1\n",
-					lvl + 1);
-		ft_env(ENV_SET, "SHLVL=1");
+		ft_dprintf(STDERR_FILENO, "minishell: warning: shell level (%d) "
+			"too high, resetting to 1\n", lvl + 1);
+		if (ft_env(ENV_SET, "SHLVL=1") == NULL)
+			return (1);
 	}
 	else if (lvl < 0)
-		ft_env(ENV_SET, "SHLVL=0");
-	else
 	{
-		lvl_str = ft_itoa(lvl + 1);
-		// TODO: ft_itoaのエラーハンドリング？
-		ft_env(ENV_SET, ft_strjoin("SHLVL=", lvl_str));
-		free(lvl_str);
+		if (ft_env(ENV_SET, "SHLVL=0") == NULL)
+			return (1);
 	}
+	else if (increment_shlvl(lvl))
+		return (1);
+	return (0);
 }
 
-int	init(t_shell **shell, char **envp)
+int	init(char **envp)
 {
-	(*shell) = (t_shell *)ft_malloc(sizeof(t_shell));
-	if (!(*shell))
+	t_shell	*shell;
+
+	shell = (t_shell *)ft_malloc(sizeof(t_shell));
+	if (!shell)
 		return (-1);
+	sh_op(SH_SET, shell);
 	sh_stat(ST_SET, 0);
-	(*shell)->input = NULL;
-	(*shell)->tokens = NULL;
-	(*shell)->ast = NULL;
+	shell->tokens = NULL;
 	if (init_env(envp))
 	{
-		free(*shell);
+		free(shell);
 		return (-1);
 	}
 	if (init_pwd())
 	{
-		free(*shell);
+		free(shell);
 		ft_env(ENV_DEL_ALL, NULL);
 		return (-1);
 	}
-	init_shlvl();
+	if (init_shlvl())
+		inner_exit(1);
+	shell->ast = NULL;
 	return (0);
 }

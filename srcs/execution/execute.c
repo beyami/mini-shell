@@ -21,18 +21,23 @@ void	child_exec(t_node *node)
 
 	cp_env = (char **)ft_env(ENV_GET_ALL_EX, NULL);
 	if (!cp_env)
-		exit(1);
+		inner_exit(1);
 	if (apply_redirs(node->redir_count, node->redirs) != 0)
-		exit(1);
+	{
+		free(cp_env);
+		inner_exit(1);
+	}
 	if (is_empty_cmds(node->argv))
 	{
+		free(cp_env);
 		ft_dprintf(STDERR_FILENO, "%s: command not found\n", node->argv[0]);
-		exit(127);
+		inner_exit(127);
 	}
 	if (is_builtin(node->argv[0]))
 	{
 		exec_builtin_cmd(node);
-		exit(sh_stat(ST_GET, 0));
+		free(cp_env);
+		inner_exit(sh_stat(ST_GET, 0));
 	}
 	else
 		exec_cmd(node->argv, cp_env);

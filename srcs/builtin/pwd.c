@@ -6,7 +6,7 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 01:29:37 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/25 01:11:59 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/27 04:13:57 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,17 +30,12 @@ int	pwd(int argc, char **argv)
 	bufs = NULL;
 	if (is_pwd_error(argc, argv))
 	{
-		ft_dprintf(STDERR_FILENO, "minishell: pwd: %s: "
-			"invalid option\n", argv[1]);
-		return (EXIT_FAILURE);
+		ft_dprintf(STDERR_FILENO, "minishell: pwd: %c%c: "
+			"invalid option\n", argv[1][0], argv[1][1]);
+		return (2);
 	}
 	bufs = ft_cwd(PWD_GET, NULL);
-	if (!bufs)
-	{
-		perror("minishell");
-		return (EXIT_FAILURE);
-	}
-	printf("%s\n", bufs);
+	ft_dprintf(STDOUT_FILENO, "%s\n", bufs);
 	return (EXIT_SUCCESS);
 }
 

@@ -6,11 +6,25 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 22:38:00 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/27 05:55:43 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/31 21:34:17 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+t_env	*env_del_all(t_env **head)
+{
+	t_env	*tmp;
+
+	while (*head)
+	{
+		tmp = (*head)->next;
+		free_env(*head);
+		*head = tmp;
+	}
+	ft_cwd(PWD_SET, NULL);
+	return (NULL);
+}
 
 char	*ft_strjoin_delim(char *s1, char delim, char *s2)
 {
@@ -52,10 +66,9 @@ char	*rm_quotes(char *val)
 			quote = '\0';
 		++i;
 	}
-	rtn = malloc(sizeof(char) * j + 1);
+	rtn = (char *)ft_malloc(sizeof(char) * j + 1);
 	if (!rtn)
 	{
-		ft_dprintf(STDERR_FILENO, "minishell: malloc: %s", strerror(errno));
 		free(val);
 		return (NULL);
 	}
@@ -109,7 +122,6 @@ t_env	*new_env(char *str, int offset)
 	rtn->next = NULL;
 	if ((eq && !rtn->val) || !rtn->name || !rtn->full)
 	{
-		ft_dprintf(STDERR_FILENO, "minishell: %s\n", strerror(errno));
 		free_env(rtn);
 		return (NULL);
 	}
@@ -131,22 +143,11 @@ t_env	*ft_add_env(t_env **head, char *str, int offset)
 		tmp = tmp->next;
 	tmp->next = new_env(str, offset);
 	if (!tmp->next)
-		return (NULL);
-	return (*head);
-}
-
-t_env	*env_del_all(t_env **head)
-{
-	t_env	*tmp;
-
-	while (*head)
 	{
-		tmp = (*head)->next;
-		free_env(*head);
-		*head = tmp;
+		env_del_all(head);
+		return (NULL);
 	}
-	*head = NULL;
-	return (NULL);
+	return (*head);
 }
 
 t_env	*search_val(t_env *head, char *name, int offset, t_val_type type)
@@ -202,18 +203,20 @@ int	list_len(t_env *head, t_env_op op)
 }
 
 //変数全て or VAL_EXのみをまとめて返す
-void	*get_env_all(t_env *head, t_env_op op)
+void	*get_env_all(t_env **head, t_env_op op)
 {
 	int		len;
 	char	**rtn;
 	t_env	*tmp;
 	int		i;
 
-	len = list_len(head, op);
+	len = list_len(*head, op);
 	rtn = (char **)ft_malloc(sizeof(char *) * (len + 1));
 	if (!rtn)
+	{
 		return (NULL);
-	tmp = head;
+	}
+	tmp = *head;
 	i = 0;
 	while (tmp)
 	{
@@ -249,18 +252,12 @@ t_env	*ft_update_env(t_env **head, char *str, int offset)
 		tmp = rm_quotes(ft_strdup(val));
 	}
 	if (!tmp)
-	{
-		perror("minishell: ");
 		return (NULL);
-	}
 	free(target->val);
 	target->val = tmp;
 	tmp = ft_strjoin_delim(target->name, '=', target->val);
 	if (!tmp)
-	{
-		perror("minishell: ");
 		return (NULL);
-	}
 	free(target->full);
 	target->full = tmp;
 	return (*head);
@@ -299,7 +296,7 @@ void	*ft_env(t_env_op op, char *str)
 	if (op == ENV_GET_VAL || op == ENV_GET_STRUCT)
 		return (get_env(head, str, op));
 	else if (op == ENV_GET_ALL_EX || op == ENV_GET_ALL_SH)
-		return (get_env_all(head, op));
+		return (get_env_all(&head, op));
 	else if (op == ENV_ADD)
 		return (ft_add_env(&head, str, 0));
 	else if (op == ENV_SET)

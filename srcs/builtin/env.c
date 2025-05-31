@@ -6,7 +6,7 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/17 00:47:01 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/25 02:46:50 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/31 21:38:38 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,13 +63,13 @@ int	env(int argc, char **argv)
 	else if (option_type > 1)
 	{
 		print_env_err(option_type, argv);
-		return (EXIT_FAILURE);
+		return (125);
 	}
 	else
 	{
 		envp = (char **)ft_env(ENV_GET_ALL_SH, NULL);
 		if (!envp)
-			return (EXIT_FAILURE);
+			inner_exit(125);
 		while (envp[i])
 			ft_dprintf(STDOUT_FILENO, "%s\n", envp[i++]);
 	}

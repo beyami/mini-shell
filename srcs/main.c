@@ -10,8 +10,9 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	rl_event_hook = event;
 	g_sig_received = 0;
-	if (init(&shell, envp) < 0)
+	if (init(envp) < 0)
 		exit(1);
+	shell = sh_op(SH_GET, NULL);
 	while (1)
 	{
 		init_signals();
@@ -23,6 +24,6 @@ int	main(int argc, char **argv, char **envp)
 		interpret(shell);
 		finish_loop(shell);
 	}
-	exit_shell(shell);
+	exit_shell(1);
 	return (0);
 }
