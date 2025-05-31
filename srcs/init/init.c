@@ -129,6 +129,7 @@ void	init_shlvl(void)
 	char	*shlvl;
 	int		lvl;
 	char	*lvl_str;
+    char    *env_str;
 
 	shlvl = ft_env(ENV_GET_VAL, "SHLVL");
 	if (!shlvl || is_valid_shlvl(shlvl))
@@ -151,8 +152,10 @@ void	init_shlvl(void)
 	{
 		lvl_str = ft_itoa(lvl + 1);
 		// TODO: ft_itoaのエラーハンドリング？
-		ft_env(ENV_SET, ft_strjoin("SHLVL=", lvl_str));
+        env_str = ft_strjoin("SHLVL=", lvl_str);
+		ft_env(ENV_SET, env_str);
 		free(lvl_str);
+        free(env_str);
 	}
 }
 
