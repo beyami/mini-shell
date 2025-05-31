@@ -1,18 +1,6 @@
 #include "minishell.h"
 
-int	count_argv(char **argv)
-{
-	int	count;
-
-	if (!argv)
-		return (0);
-	count = 0;
-	while (argv[count])
-		count++;
-	return (count);
-}
-
-int	process_expand_cmds(t_exp_tkn **head, char **argv)
+static int	process_expand_cmds(t_exp_tkn **head, char **argv)
 {
 	int	i;
 
@@ -44,10 +32,7 @@ int	expand_cmds(t_node *node)
 		free_exp_tokens(head);
 		return (1);
 	}
-	// リストから新しいargvを構築して割当→元のargvを解放
-	exp_token_to_argv(head, &node->argv);
-	// argcを更新
-	node->argc = count_argv(node->argv);
-	free_exp_tokens(head);
+	if (update_args_from_exp(head, node) != 0)
+		return (1);
 	return (0);
 }

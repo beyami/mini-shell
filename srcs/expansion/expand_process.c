@@ -1,22 +1,6 @@
 #include "minishell.h"
 
-// 展開しない & クォートのついてない文字列を抜粋してexpトークンを作成
-// 合わせてポインタを進める
-t_exp_tkn	*extract_literal(char **s, int len)
-{
-	char	*str;
-
-	if (len == 0)
-		str = ft_strdup("");
-	else
-		str = ft_strndup(*s, len);
-	if (!str)
-		return (NULL);
-	*s += len;
-	return (new_exp_token(str, false));
-}
-
-int	process_double_quote(t_exp_tkn **head, char **p, int env_flag)
+static int	process_double_quote(t_exp_tkn **head, char **p, int env_flag)
 {
 	int			len;
 	t_exp_tkn	*new_tkn;
@@ -24,7 +8,7 @@ int	process_double_quote(t_exp_tkn **head, char **p, int env_flag)
 	while (**p && **p != '"')
 	{
 		if (**p == '$' && env_flag)
-			new_tkn = expand_env_var(p);
+			new_tkn = expand_env_var(p, true);
 		else
 		{
 			len = 0;
@@ -34,23 +18,23 @@ int	process_double_quote(t_exp_tkn **head, char **p, int env_flag)
 					break ;
 				len++;
 			}
-			new_tkn = extract_literal(p, len);
+			new_tkn = extract_literal(p, len, true);
 		}
 		if (!new_tkn)
 			return (1);
 		append_exp_token(head, new_tkn);
 	}
-    return (0);
+	return (0);
 }
 
 // ダブルクォート内の処理
-int	handle_double_quote(t_exp_tkn **head, char **p, int env_flag)
+static int	handle_double_quote(t_exp_tkn **head, char **p, int env_flag)
 {
 	t_exp_tkn	*new_tkn;
 
 	if (**p == '"')
 	{
-		new_tkn = extract_literal(p, 0);
+		new_tkn = extract_literal(p, 0, true);
 		if (!new_tkn)
 			return (1);
 		append_exp_token(head, new_tkn);
@@ -62,20 +46,20 @@ int	handle_double_quote(t_exp_tkn **head, char **p, int env_flag)
 }
 
 // シングルクォート内の処理
-int	handle_single_quote(t_exp_tkn **head, char **p)
+static int	handle_single_quote(t_exp_tkn **head, char **p)
 {
 	int			len;
 	t_exp_tkn	*new_tkn;
 
 	if (**p == '\'')
-		new_tkn = extract_literal(p, 0);
-    else
-    {
-        len = 0;
-        while ((*p)[len] && (*p)[len] != '\'')
-            len++;
-        new_tkn = extract_literal(p, len);
-    }
+		new_tkn = extract_literal(p, 0, true);
+	else
+	{
+		len = 0;
+		while ((*p)[len] && (*p)[len] != '\'')
+			len++;
+		new_tkn = extract_literal(p, len, true);
+	}
 	if (!new_tkn)
 		return (1);
 	append_exp_token(head, new_tkn);
@@ -83,23 +67,23 @@ int	handle_single_quote(t_exp_tkn **head, char **p)
 }
 
 // クォートなし部分の処理
-int	handle_no_quote(t_exp_tkn **head, char **p, int env_flag)
+static int	handle_no_quote(t_exp_tkn **head, char **p, int env_flag)
 {
 	int			len;
 	t_exp_tkn	*new_tkn;
 
 	if (**p == '$' && env_flag)
-		new_tkn = expand_env_var(p);
+		new_tkn = expand_env_var(p, false);
 	else
 	{
 		len = 0;
 		while ((*p)[len] && (!env_flag || (*p)[len] != '$'))
 			len++;
-		new_tkn = extract_literal(p, len);
+		new_tkn = extract_literal(p, len, false);
 	}
-    if (!new_tkn)
-        return (1);
-    append_exp_token(head, new_tkn);
+	if (!new_tkn)
+		return (1);
+	append_exp_token(head, new_tkn);
 	return (0);
 }
 

@@ -102,11 +102,21 @@ typedef struct s_redir
 	char			*temp_file;
 }					t_redir;
 
+// 展開
+typedef struct s_exp_tkn
+{
+	char				*str;
+	bool				is_expanded;
+    bool                is_quoted;
+	struct s_exp_tkn 	*next;
+}						t_exp_tkn;
+
 typedef struct s_node
 {
 	t_node_kind		kind;
 	// コマンドとオプション、引数
 	int				argc;
+    t_exp_tkn       *argv_lst;
 	char			**argv;
 	// リダイレクト
 	int				redir_count;
@@ -117,14 +127,6 @@ typedef struct s_node
 	int				in_fd;
 	int				pipefd[2];
 }					t_node;
-
-// 展開
-typedef struct s_exp_tkn
-{
-	char				*str;
-	bool				is_expanded;
-	struct s_exp_tkn 	*next;
-}						t_exp_tkn;
 
 // minishell全体
 typedef struct s_shell
@@ -185,10 +187,12 @@ int					expand(t_node *node);
 int                 expand_cmds(t_node *node);
 int                 expand_redirs(t_node *node);
 int                 tokenize_with_expansion(t_exp_tkn **head, char *str, int env_flag);
+int	                merge_expansion_tokens(t_exp_tkn **head);
 int					split_exp_tokens(t_exp_tkn **head);
-t_exp_tkn			*expand_env_var(char **s);
-int					exp_token_to_argv(t_exp_tkn *head, char ***argv);
-t_exp_tkn			*new_exp_token(char *str, bool is_expanded);
+t_exp_tkn	        *extract_literal(char **s, int len, bool is_quoted);
+t_exp_tkn	        *expand_env_var(char **s, bool is_quoted);
+int	update_args_from_exp(t_exp_tkn *head, t_node *node);
+t_exp_tkn	        *new_exp_token(char *str, bool is_expanded, bool is_quoted);
 void				append_exp_token(t_exp_tkn **head, t_exp_tkn *new);
 void				free_exp_tokens(t_exp_tkn *head);
 

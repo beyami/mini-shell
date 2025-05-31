@@ -1,7 +1,7 @@
 #include "minishell.h"
 
-// 文字列の数を数える
-int	count_exp_tokens(t_exp_tkn *head)
+// コマンドの数を数える
+static int	count_exp_tokens(t_exp_tkn *head)
 {
 	int			count;
 	t_exp_tkn	*cur;
@@ -17,7 +17,7 @@ int	count_exp_tokens(t_exp_tkn *head)
 }
 
 // リストから新しい二次元配列に文字列をコピー
-int	copy_exp_to_argv(char **argv, t_exp_tkn *head)
+static int	copy_exp_to_array(char **argv, t_exp_tkn *head)
 {
 	t_exp_tkn	*cur;
 	int			i;
@@ -40,30 +40,30 @@ int	copy_exp_to_argv(char **argv, t_exp_tkn *head)
 }
 
 // リストから新しい二次元配列を構築
-char	**build_argv_from_exp(t_exp_tkn *head, int count)
+static char	**build_array_from_exp(t_exp_tkn *head, int count)
 {
 	char	**argv;
 
 	argv = (char **)ft_malloc(sizeof(char *) * (count + 1));
 	if (!argv)
 		return (NULL);
-	if (copy_exp_to_argv(argv, head) != 0)
+	if (copy_exp_to_array(argv, head) != 0)
 		return (NULL);
 	return (argv);
 }
 
-// 空文字列以外の文字列からargvを構築
-int	exp_token_to_argv(t_exp_tkn *head, char ***argv)
+int	update_args_from_exp(t_exp_tkn *head, t_node *node)
 {
-	int	count;
-
-	count = count_exp_tokens(head);
-	free_2d_array(*argv);
-	if (count == 0)
+	node->argc = count_exp_tokens(head);
+	node->argv_lst = head;
+	free_2d_array(node->argv);
+	if (node->argc == 0)
 	{
-		*argv = NULL;
+		node->argv = NULL;
 		return (0);
 	}
-	*argv = build_argv_from_exp(head, count);
+	node->argv = build_array_from_exp(node->argv_lst, node->argc);
+	if (!node->argv)
+		return (1);
 	return (0);
 }

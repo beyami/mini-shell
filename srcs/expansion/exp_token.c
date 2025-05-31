@@ -1,7 +1,7 @@
 #include "minishell.h"
 
 // 新しいexpトークンを作成
-t_exp_tkn	*new_exp_token(char *str, bool is_expanded)
+t_exp_tkn	*new_exp_token(char *str, bool is_expanded, bool is_quoted)
 {
 	t_exp_tkn	*new;
 
@@ -13,6 +13,7 @@ t_exp_tkn	*new_exp_token(char *str, bool is_expanded)
 	}
 	new->str = str;
 	new->is_expanded = is_expanded;
+	new->is_quoted = is_quoted;
 	new->next = NULL;
 	return (new);
 }

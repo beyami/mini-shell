@@ -1,7 +1,8 @@
 #include "minishell.h"
 
 // 単語を抜粋し、新しいexpトークンとしてリストに追加
-int	add_exp_token_from_substr(t_exp_tkn **head, char **p, int len)
+static int	add_exp_token_from_substr(t_exp_tkn **head, char **p, int len,
+		bool is_quoted)
 {
 	char		*str;
 	t_exp_tkn	*new;
@@ -13,7 +14,7 @@ int	add_exp_token_from_substr(t_exp_tkn **head, char **p, int len)
 	if (!str)
 		return (1);
 	*p += len;
-	new = new_exp_token(str, true);
+	new = new_exp_token(str, true, is_quoted);
 	if (!new)
 	{
 		free(str);
@@ -24,7 +25,7 @@ int	add_exp_token_from_substr(t_exp_tkn **head, char **p, int len)
 }
 
 // 空白文字（スペースまたはタブ文字）で単語分割
-t_exp_tkn	*split_by_blank(char *s)
+static t_exp_tkn	*split_by_blank(char *s, bool is_quoted)
 {
 	t_exp_tkn	*head;
 	char		*p;
@@ -41,7 +42,7 @@ t_exp_tkn	*split_by_blank(char *s)
 		while (p[start] && !is_blank(p[start]))
 			start++;
 		len = start;
-		if (add_exp_token_from_substr(&head, &p, len) != 0)
+		if (add_exp_token_from_substr(&head, &p, len, is_quoted) != 0)
 		{
 			free_exp_tokens(head);
 			return (NULL);
@@ -55,7 +56,7 @@ int	process_split_exp_tokens(t_exp_tkn **head, t_exp_tkn *cur, t_exp_tkn **prev)
 	t_exp_tkn	*split_head;
 	t_exp_tkn	*split_tail;
 
-	split_head = split_by_blank(cur->str);
+	split_head = split_by_blank(cur->str, cur->is_quoted);
 	if (!split_head)
 		return (1);
 	split_tail = split_head;

@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	split_expanded_env(t_exp_tkn **head, char *str)
+static int	split_expanded_redir_env(t_exp_tkn **head, char *str)
 {
 	int			count;
 	t_exp_tkn	*cur;
@@ -29,7 +29,7 @@ int	split_expanded_env(t_exp_tkn **head, char *str)
 	return (0);
 }
 
-int	process_expand_redirs(t_exp_tkn **new, t_redir *redir, int env_flag)
+static int	process_expand_redirs(t_exp_tkn **new, t_redir *redir, int env_flag)
 {
 	if (tokenize_with_expansion(new, redir->str, env_flag) != 0)
 	{
@@ -37,7 +37,7 @@ int	process_expand_redirs(t_exp_tkn **new, t_redir *redir, int env_flag)
 		return (1);
 	}
 	if (env_flag)
-		if (split_expanded_env(new, redir->str) != 0)
+		if (split_expanded_redir_env(new, redir->str) != 0)
 			return (1);
 	free(redir->str);
 	if (!*new)

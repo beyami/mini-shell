@@ -54,6 +54,8 @@ void	free_ast(t_node *ast)
 		free_ast(ast->lhs);
 	if (ast->rhs)
 		free_ast(ast->rhs);
+	if (ast->argv_lst)
+		free_exp_tokens(ast->argv_lst);
 	if (ast->argv)
 		free_2d_array(ast->argv);
 	if (ast->redirs)
