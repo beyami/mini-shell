@@ -6,17 +6,12 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 14:15:50 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/31 21:37:02 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/06/01 03:30:57 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/**
- * １つの環境変数を
- * declare -x <NAME>=<VALUE>\n
- * の形で表示する
- */
 void	print_env(char *env)
 {
 	int	i;

@@ -6,7 +6,7 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 02:47:53 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/31 21:54:46 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/05/31 22:01:57 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ int	set_env(char *str)
 {
 	int	i;
 	int	plus;
-	//TODO エラー処理
 
 	i = get_eq_idx(str, &plus);
 	if (i == -1)

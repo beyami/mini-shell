@@ -6,40 +6,13 @@
 /*   By: yumiyao <yumiyao@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 14:10:15 by yumiyao           #+#    #+#             */
-/*   Updated: 2025/05/31 22:31:33 by yumiyao          ###   ########.fr       */
+/*   Updated: 2025/06/01 03:01:05 by yumiyao          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**get_longer_split(char **split, char *new, int len)
-{
-	int		i;
-	char	**rtn;
-	char	*cp_new;
-
-	i = 0;
-	rtn = (char **)ft_malloc(sizeof(char *) * (len + 2));
-	cp_new = ft_strdup(new);
-	if (!rtn || !cp_new)
-	{
-		free(rtn);
-		free(cp_new);
-		free_2d_array(split);
-		return (NULL);
-	}
-	while (split[i])
-	{
-		rtn[i] = split[i];
-		++i;
-	}
-	rtn[i++] = cp_new;
-	rtn[i] = NULL;
-	free(split);
-	return (rtn);
-}
-
-char	**make_abs_path(char **dest_split, char **inner_split, int inner_len)
+char	*make_abs_path(char **dest_split, char **inner_split, int inner_len)
 {
 	int	i;
 
@@ -65,7 +38,7 @@ char	**make_abs_path(char **dest_split, char **inner_split, int inner_len)
 		}
 		++i;
 	}
-	return (inner_split);
+	return (ft_union(inner_split, '/'));
 }
 
 char	*get_abs_path(char *dest)
@@ -91,8 +64,7 @@ char	*get_abs_path(char *dest)
 	inner_len = 0;
 	while (inner_split[inner_len])
 		++inner_len;
-	inner_split = make_abs_path(dest_split, inner_split, inner_len);
-	rtn = ft_union(inner_split, '/');
+	rtn = make_abs_path(dest_split, inner_split, inner_len);
 	free_2d_array(inner_split);
 	free_2d_array(dest_split);
 	return (rtn);
@@ -117,14 +89,11 @@ int	check_cwd(char *path)
 	return (0);
 }
 
-char	*move_to_some(char *dest)
+char	*get_path(char *dest)
 {
 	char	*path;
 	char	*joined;
-	int		res;
 
-	if (check_cwd(dest))
-		return (NULL);
 	if (dest[0] == '/')
 		path = ft_strdup(dest);
 	else if (ft_strncmp("./", dest, 2) == 0)
@@ -135,19 +104,21 @@ char	*move_to_some(char *dest)
 		path = get_abs_path(joined);
 		free(joined);
 	}
+	return (path);
+}
+
+char	*move_to_some(char *dest)
+{
+	char	*path;
+	int		res;
+
+	if (check_cwd(dest))
+		return (NULL);
+	path = get_path(dest);
 	if (!path)
 		inner_exit(1);
-	if (access(path, F_OK))
+	if (check_access(dest, path))
 	{
-		ft_dprintf(STDERR_FILENO, "minishell: cd: %s: No such "
-			"file or directly\n", dest);
-		free(path);
-		return (NULL);
-	}
-	if (access(path, X_OK) != 0)
-	{
-		ft_dprintf(STDERR_FILENO, "minishell: cd:"
-			" %s: Permission denied\n", dest);
 		free(path);
 		return (NULL);
 	}
