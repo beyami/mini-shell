@@ -31,12 +31,12 @@ int	restore_std_fds(int stashed_stdin, int stashed_stdout)
 {
 	if (dup2(stashed_stdin, STDIN_FILENO) == -1)
 	{
-		perror("minishell: dup2");
+		ft_dprintf(STDERR_FILENO, "minishell: dup2: %s\n", strerror(errno));
 		return (1);
 	}
 	if (dup2(stashed_stdout, STDOUT_FILENO) == -1)
 	{
-		perror("minishell: dup2");
+		ft_dprintf(STDERR_FILENO, "minishell: dup2: %s\n", strerror(errno));
 		return (1);
 	}
 	close(stashed_stdin);
@@ -54,7 +54,7 @@ int	process_builtin_direct(t_node *node)
 	stashed_stdout = dup(STDOUT_FILENO);
 	if (stashed_stdin == -1 || stashed_stdout == -1)
 	{
-		perror("minishell: dup");
+		ft_dprintf(STDERR_FILENO, "minishell: dup: %s\n", strerror(errno));
 		return (1);
 	}
 	if (apply_redirs(node->redir_count, node->redirs) != 0)

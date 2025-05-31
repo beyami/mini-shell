@@ -7,7 +7,8 @@ int	prepare_pipe(t_node *node)
 	{
 		if (pipe(node->pipefd) < 0)
 		{
-			perror("minishell: pipe");
+			ft_dprintf(STDERR_FILENO, "minishell: "
+				"pipe: %s\n", strerror(errno));
 			return (-1);
 		}
 	}
@@ -22,7 +23,7 @@ void	prepare_pipe_child(t_node *node, int count)
 	{
 		if (dup2(node->in_fd, STDIN_FILENO) == -1)
 		{
-			perror("minishell: dup2");
+			ft_dprintf(STDERR_FILENO, "minishell: dup2: %s\n", strerror(errno));
 			exit(1);
 		}
 		close(node->in_fd);
@@ -32,7 +33,7 @@ void	prepare_pipe_child(t_node *node, int count)
 	{
 		if (dup2(node->pipefd[1], STDOUT_FILENO) == -1)
 		{
-			perror("minishell: dup2");
+			ft_dprintf(STDERR_FILENO, "minishell: dup2: %s\n", strerror(errno));
 			exit(1);
 		}
 		close(node->pipefd[1]);

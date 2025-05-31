@@ -55,7 +55,7 @@ pid_t	run_pipeline(t_node *node, int count)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("minishell: fork");
+		ft_dprintf(STDERR_FILENO, "minishell: fork: %s\n", strerror(errno));
 		return (-1);
 	}
 	if (pid == 0)

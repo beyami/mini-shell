@@ -8,13 +8,13 @@ int	apply_heredoc_redir(t_redir *redir)
 	heredoc_fd = open(redir->temp_file, O_RDONLY);
 	if (heredoc_fd < 0)
 	{
-		perror("minishell: open");
+		ft_dprintf(STDERR_FILENO, "minishell: open: %s\n", strerror(errno));
 		return (1);
 	}
 	if (dup2(heredoc_fd, STDIN_FILENO) == -1)
 	{
 		close(heredoc_fd);
-		perror("minishell: dup2");
+		ft_dprintf(STDERR_FILENO, "minishell: dup2: %s\n", strerror(errno));
 		return (1);
 	}
 	close(heredoc_fd);
@@ -36,7 +36,7 @@ int	apply_io_redir(t_redir *redir, int flags, int std_fd)
 	if (dup2(fd, std_fd) == -1)
 	{
 		close(fd);
-		perror("minishell: dup2");
+		ft_dprintf(STDERR_FILENO, "minishell: dup2: %s\n", strerror(errno));
 		return (1);
 	}
 	close(fd);

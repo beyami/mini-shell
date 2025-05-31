@@ -18,7 +18,8 @@ void	set_exec_sigint(void)
 	sa.sa_flags = 0;
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 	{
-		perror("minishell: sigaction");
+		ft_dprintf(STDERR_FILENO, "minishell: "
+			"sigaction: %s\n", strerror(errno));
 		exit(1);
 	}
 }
@@ -33,7 +34,8 @@ void	set_main_sigint(void)
 	sa.sa_flags = 0;
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 	{
-		perror("minishell: sigaction");
+		ft_dprintf(STDERR_FILENO, "minishell: "
+			"sigaction: %s\n", strerror(errno));
 		exit(1);
 	}
 }
