@@ -137,14 +137,6 @@ typedef struct s_node
 	int				pipefd[2];
 }					t_node;
 
-// expand
-typedef struct s_exp_tkn
-{
-	char				*str;
-	bool				is_expanded;
-	struct s_exp_tkn	*next;
-}					t_exp_tkn;
-
 typedef enum e_op_shell
 {
 	SH_SET,
