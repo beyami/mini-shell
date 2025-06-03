@@ -29,8 +29,8 @@ int	apply_io_redir(t_redir *redir, int flags, int std_fd)
 	fd = open(redir->str, flags, 0644);
 	if (fd < 0)
 	{
-		ft_dprintf(STDERR_FILENO, "minishell: %s: %s\n",
-			redir->str, strerror(errno));
+		ft_dprintf(STDERR_FILENO, "minishell: %s: %s\n", redir->str,
+			strerror(errno));
 		return (1);
 	}
 	if (dup2(fd, std_fd) == -1)
@@ -67,12 +67,8 @@ int	apply_redirs(int redir_count, t_redir **redirs)
 	while (i < redir_count)
 	{
 		if (process_redir(redirs[i]) != 0)
-		{
-			unlink_all_temp(redir_count, redirs);
 			return (1);
-		}
 		i++;
 	}
-	unlink_all_temp(redir_count, redirs);
 	return (0);
 }

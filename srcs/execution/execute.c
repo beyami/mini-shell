@@ -83,10 +83,7 @@ int	execute(t_node *root)
 	last_cmd = NULL;
 	link_exec_nodes(root, root->rhs, &first_cmd, &last_cmd);
 	if (handle_all_heredocs(first_cmd) != 0)
-	{
-		unlink_all_temp(first_cmd->redir_count, first_cmd->redirs);
 		return (1);
-	}
 	// ビルトインコマンド単体の場合
 	if (root->kind == ND_CMD && root->argv && is_builtin(root->argv[0]))
 	{
@@ -97,6 +94,6 @@ int	execute(t_node *root)
 	last_pid = run_pipeline(first_cmd, 0);
 	if (last_pid < 0)
 		return (1);
-	sh_stat(ST_SET, wait_children(last_pid));
+	sh_stat(ST_SET, wait_children(last_pid, first_cmd));
 	return (0);
 }

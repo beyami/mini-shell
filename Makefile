@@ -1,6 +1,7 @@
 NAME = minishell
 
 CC = cc
+# TODO: -gあとで消す
 CFLAGS = -Wall -Wextra -Werror -g
 
 RM = rm -f
@@ -11,6 +12,7 @@ SRCS_DIR = ./srcs ./srcs/builtin ./srcs/execution ./srcs/tokenization ./srcs/ini
 
 LIB = $(LIB_DIR)/lib.a -lreadline
 
+# TODO: wildcard削除
 SRCS = $(foreach dir,$(SRCS_DIR),$(wildcard $(dir)/*.c))
 OBJS = $(SRCS:.c=.o)
 INCLUDES = -I ./includes -I ./$(LIB_DIR)/includes

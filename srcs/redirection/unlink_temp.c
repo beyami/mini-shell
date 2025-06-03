@@ -1,18 +1,27 @@
 #include "minishell.h"
 
 // ヒアドキュメントの一時ファイルをすべて削除
-void	unlink_all_temp(int redir_count, t_redir **redirs)
+void	unlink_all_temp(t_node *first)
 {
-	int	i;
+	t_node	*cur;
+	int		i;
 
-	i = 0;
-	while (i < redir_count)
+	if (!first)
+		return ;
+	cur = first;
+	while (cur)
 	{
-		if (redirs[i]->temp_file)
+		i = 0;
+		while (i < cur->redir_count)
 		{
-			unlink(redirs[i]->temp_file);
-			free(redirs[i]->temp_file);
+			if (cur->redirs[i]->temp_file)
+			{
+				unlink(cur->redirs[i]->temp_file);
+				free(cur->redirs[i]->temp_file);
+				cur->redirs[i]->temp_file = NULL;
+			}
+			i++;
 		}
-		i++;
+		cur = cur->next_cmd;
 	}
 }

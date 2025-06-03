@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	wait_children(pid_t last_pid)
+int	wait_children(pid_t last_pid, t_node *first_cmd)
 {
 	pid_t	wait_ret;
 	int		w_status;
@@ -38,5 +38,6 @@ int	wait_children(pid_t last_pid)
 				break ;
 		}
 	}
+	unlink_all_temp(first_cmd);
 	return (status);
 }
